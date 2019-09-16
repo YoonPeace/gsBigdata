@@ -1,20 +1,26 @@
 select obs_date
      , pvn_nm
-	 , bor_nm
+	 , case when pvn_nm ='인천광역시' and bor_nm ='남구' then '미추홀구' else bor_nm end as bor_nm
 	 , area
-	 , so2 
+	 , coalesce(so2, avg(so2) over (partition by obs_date, area)) as so2 
+	 , coalesce(co, avg(co) over (partition by obs_date, area)) as co 
+	 , coalesce(o3, avg(o3) over (partition by obs_date, area)) as o3 
+	 , coalesce(n02, avg(n02) over (partition by obs_date, area)) as n02 
+	 , coalesce(pm10, avg(pm10) over (partition by obs_date, area)) as pm10 
+	 , coalesce(pm25, avg(pm25) over (partition by obs_date, area)) as pm25 
   from (
         select obs_date
              , pvn_nm
              , bor_nm
-             , case when pvn_nm = '경기도' and bor_nm = '광명시' then '서부'
-                    when pvn_nm = '경기도' and bor_nm = '군포시' then '서부'
+             , case when pvn_nm = '경기도' and bor_nm = '광명시' then '중부'
+                    when pvn_nm = '경기도' and bor_nm = '군포시' then '남부'
                     when pvn_nm = '경기도' and bor_nm = '김포시' then '서부'
-                    when pvn_nm = '경기도' and bor_nm = '부천시' then '서부'
-                    when pvn_nm = '경기도' and bor_nm = '안양시' then '서부'
-                    when pvn_nm = '경기도' and bor_nm = '의왕시' then '서부'
-                    when pvn_nm = '경기도' and bor_nm = '하남시' then '서부'
+                    when pvn_nm = '경기도' and bor_nm = '부천시' then '중부'
+                    when pvn_nm = '경기도' and bor_nm = '안양시' then '남부'
+                    when pvn_nm = '경기도' and bor_nm = '의왕시' then '남부'
+                    when pvn_nm = '경기도' and bor_nm = '하남시' then '중부'
                     when pvn_nm = '인천광역시' and bor_nm = '계양구' then '서부'
+                    when pvn_nm = '인천광역시' and bor_nm = '중구' then '서부'
                     when pvn_nm = '인천광역시' and bor_nm = '남구' then '서부'
                     when pvn_nm = '인천광역시' and bor_nm = '남동구' then '서부'
                     when pvn_nm = '인천광역시' and bor_nm = '동구' then '서부'
@@ -70,19 +76,19 @@ select obs_date
                 ,  t2.area
         		) tt 
         group by obs_date
-               , pvn_nm
-               , bor_nm
-               , case when pvn_nm = '경기도' and bor_nm = '광명시' then '서부'
-                      when pvn_nm = '경기도' and bor_nm = '군포시' then '서부'
-                      when pvn_nm = '경기도' and bor_nm = '김포시' then '서부'
-                      when pvn_nm = '경기도' and bor_nm = '부천시' then '서부'
-                      when pvn_nm = '경기도' and bor_nm = '안양시' then '서부'
-                      when pvn_nm = '경기도' and bor_nm = '의왕시' then '서부'
-                      when pvn_nm = '경기도' and bor_nm = '하남시' then '서부'
-                      when pvn_nm = '인천광역시' and bor_nm = '계양구' then '서부'
-                      when pvn_nm = '인천광역시' and bor_nm = '남구' then '서부'
-                      when pvn_nm = '인천광역시' and bor_nm = '남동구' then '서부'
-                      when pvn_nm = '인천광역시' and bor_nm = '동구' then '서부'
-                      else area end
+             , pvn_nm
+             , bor_nm
+             , case when pvn_nm = '경기도' and bor_nm = '광명시' then '중부'
+                    when pvn_nm = '경기도' and bor_nm = '군포시' then '남부'
+                    when pvn_nm = '경기도' and bor_nm = '김포시' then '서부'
+                    when pvn_nm = '경기도' and bor_nm = '부천시' then '중부'
+                    when pvn_nm = '경기도' and bor_nm = '안양시' then '남부'
+                    when pvn_nm = '경기도' and bor_nm = '의왕시' then '남부'
+                    when pvn_nm = '경기도' and bor_nm = '하남시' then '중부'
+                    when pvn_nm = '인천광역시' and bor_nm = '계양구' then '서부'
+                    when pvn_nm = '인천광역시' and bor_nm = '중구' then '서부'
+                    when pvn_nm = '인천광역시' and bor_nm = '남구' then '서부'
+                    when pvn_nm = '인천광역시' and bor_nm = '남동구' then '서부'
+                    when pvn_nm = '인천광역시' and bor_nm = '동구' then '서부'
+                    else area end
 		) t
-where so2 is null
